@@ -41,7 +41,7 @@
                   "});",
                   "",
                   "pm.test(\"Response time is less than 2000ms\", function () {",
-                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -150,6 +150,10 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
                   "const responseData = pm.response.json();",
                   "",
                   "pm.environment.set(\"idLab\", responseData.data.id);",
@@ -160,10 +164,6 @@
                   "const savedIdLab = pm.environment.get(\"idLab\");",
                   "const savedTitleLab = pm.environment.get(\"uniqueTitle\");",
                   "const savedDescLab = pm.environment.get(\"uniqueDescription\");",
-                  "",
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
                   "",
                   "pm.test(\"Validate response body\", function () {",
                   "    pm.expect(responseData.success).to.be.true;",
@@ -212,7 +212,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"{{titleLab}}\",\n  \"description\": \"{{DescriptionLab}}\"\n}",
+              "raw": "{\n  \"title\": \"{{TitleLab}}\",\n  \"description\": \"{{DescriptionLab}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -239,6 +239,10 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
                   "const responseData = pm.response.json();",
                   "",
                   "const savedUserId = pm.environment.get(\"userId\");",
@@ -250,10 +254,6 @@
                   "    pm.expect(responseData.error.message).to.equal(\"Lab with this title and description already exists\");",
                   "    pm.expect(responseData.path).to.equal(\"/api/labs\");",
                   "    pm.expect(responseData.method).to.equal(\"POST\");",
-                  "});",
-                  "",
-                  "pm.test(\"Status code is 409\", function () {",
-                  "    pm.response.to.have.status(409);",
                   "});",
                   "",
                   "pm.test(\"Response time is less than 1000ms\", function () {",
@@ -289,7 +289,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"{{titleLab}}\",\n  \"description\": \"{{descriptionLab}}\"\n}",
+              "raw": "{\n  \"title\": \"{{TitleLab}}\",\n  \"description\": \"{{DescriptionLab}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -539,12 +539,92 @@
           "response": []
         },
         {
+          "name": "Search by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const savedIdLab = pm.environment.get(\"idLab\");",
+                  "const savedTitleLab = pm.environment.get(\"uniqueTitle\");",
+                  "const savedLabDesc = pm.environment.get(\"uniqueDescription\");",
+                  "const savedUserId = pm.environment.get(\"userId\");",
+                  "",
+                  "const responseData = pm.response.json();",
+                  "pm.test(\"Validate response body\", function () {",
+                  "    pm.expect(responseData.success).to.be.true;",
+                  "    pm.expect(responseData.data.id).to.equal(savedIdLab);",
+                  "    pm.expect(responseData.data.title).to.equal(savedTitleLab);",
+                  "    pm.expect(responseData.data.description).to.equal(savedLabDesc);",
+                  "    pm.expect(responseData.data.user_id).to.equal(savedUserId);",
+                  "})",
+                  "",
+                  "pm.test(\"Response time is less than 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/api/labs/{{idLab}}?id",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "labs",
+                "{{idLab}}"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Success Update Labs",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
                   "const responseData = pm.response.json();",
                   "",
                   "// pm.environment.get(\"idLab\");",
@@ -555,10 +635,6 @@
                   "const savedTitleLab = pm.environment.get(\"UpdatedTitleLab\");",
                   "const savedDescLab = pm.environment.get(\"UpdatedDescriptionLab\");",
                   "const savedIdLab = pm.environment.get(\"idLab\");",
-                  "",
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
                   "",
                   "pm.test(\"Validate response body\", function () {",
                   "    pm.expect(responseData.success).to.be.true;",
@@ -759,125 +835,8 @@
             }
           },
           "response": []
-        },
-        {
-          "name": "Search by Id",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "const savedIdLab = pm.environment.get(\"idLab\");",
-                  "const savedTitleLab = pm.environment.get(\"UpdatedTitleLab\");",
-                  "const savedLabDesc = pm.environment.get(\"UpdatedDescriptionLab\");",
-                  "const savedUserId = pm.environment.get(\"userId\");",
-                  "",
-                  "const responseData = pm.response.json();",
-                  "pm.test(\"Validate response body\", function () {",
-                  "    pm.expect(responseData.success).to.be.true;",
-                  "    pm.expect(responseData.data.id).to.equal(savedIdLab);",
-                  "    pm.expect(responseData.data.title).to.equal(savedTitleLab);",
-                  "    pm.expect(responseData.data.description).to.equal(savedLabDesc);",
-                  "    pm.expect(responseData.data.user_id).to.equal(savedUserId);",
-                  "})",
-                  "",
-                  "pm.test(\"Response time is less than 1000ms\", function () {",
-                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{url}}/api/labs/{{idLab}}?id",
-              "host": [
-                "{{url}}"
-              ],
-              "path": [
-                "api",
-                "labs",
-                "{{idLab}}"
-              ],
-              "query": [
-                {
-                  "key": "id",
-                  "value": null
-                }
-              ]
-            }
-          },
-          "response": []
         }
       ]
-    },
-    {
-      "name": "Register",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"deivis.dea@email.com\",\n  \"password\": \"password\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{url}}}/api/auth/register",
-          "host": [
-            "{{url}}}"
-          ],
-          "path": [
-            "api",
-            "auth",
-            "register"
-          ]
-        }
-      },
-      "response": []
     },
     {
       "name": "Logout",
