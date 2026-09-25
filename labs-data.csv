@@ -1,0 +1,4 @@
+scenario,title,description,expectedStatus,expectedSuccess
+valid,CSV valid title,CSV valid description,201,true
+invalid_empty_title,,Description for empty title,4xx,false
+edge_special_characters,Edge title - cafe QA #1,"Description with quotes ""quoted""; comma, ampersand & and symbols !?",201,true

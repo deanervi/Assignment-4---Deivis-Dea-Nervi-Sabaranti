@@ -233,6 +233,90 @@
           "response": []
         },
         {
+          "name": "Data-driven Create Labs (CSV)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const expectedStatus = String(pm.iterationData.get(\"expectedStatus\"));",
+                  "const csvTitle = pm.iterationData.get(\"title\");",
+                  "const uniqueSuffix = Date.now() + \"-\" + pm.info.iteration;",
+                  "const testTitle = expectedStatus === \"201\" ? csvTitle + \" \" + uniqueSuffix : csvTitle;",
+                  "pm.variables.set(\"dataDrivenTitle\", testTitle);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const expectedStatus = String(pm.iterationData.get(\"expectedStatus\"));",
+                  "const expectedSuccess = String(pm.iterationData.get(\"expectedSuccess\")) === \"true\";",
+                  "const responseData = pm.response.json();",
+                  "const dataTitle = pm.variables.get(\"dataDrivenTitle\");",
+                  "const dataDescription = pm.iterationData.get(\"description\");",
+                  "",
+                  "pm.test(\"Validasi response code: \" + expectedStatus, function () {",
+                  "    if (expectedStatus === \"4xx\") {",
+                  "        pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "    } else {",
+                  "        pm.expect(pm.response.code).to.equal(Number(expectedStatus));",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test(\"Validasi response body\", function () {",
+                  "    pm.expect(responseData.success).to.equal(expectedSuccess);",
+                  "});",
+                  "",
+                  "if (expectedSuccess) {",
+                  "    pm.test(\"Validasi title dan description sesuai file CSV\", function () {",
+                  "        pm.expect(responseData.data.title).to.equal(dataTitle);",
+                  "        pm.expect(responseData.data.description).to.equal(dataDescription);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{dataDrivenTitle}}\",\n  \"description\": \"{{description}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/api/labs",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "api",
+                "labs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Failed Create Labs Duplicate",
           "event": [
             {
