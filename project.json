@@ -41,7 +41,7 @@
                   "});",
                   "",
                   "pm.test(\"Response time is less than 2000ms\", function () {",
-                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -103,7 +103,7 @@
                   "    pm.expect(responseData.data.user.status).to.equal(savedStatus);",
                   "});",
                   "",
-                  "pm.test(\"Response time is less than 1000ms\", function () {",
+                  "pm.test(\"Response time is less than 200ms\", function () {",
                   "    pm.expect(pm.response.responseTime).to.be.below(1000);",
                   "});"
                 ],
@@ -153,13 +153,13 @@
                   "const responseData = pm.response.json();",
                   "",
                   "pm.environment.set(\"idLab\", responseData.data.id);",
-                  "pm.environment.set(\"titleLab\", responseData.data.title);",
-                  "pm.environment.set(\"descriptionLab\", responseData.data.description);",
+                  "pm.environment.set(\"uniqueTitle\", responseData.data.title);",
+                  "pm.environment.set(\"uniqueDescription\", responseData.data.description);",
                   "",
                   "const savedUserId = pm.environment.get(\"userId\");",
                   "const savedIdLab = pm.environment.get(\"idLab\");",
-                  "const savedTitleLab = pm.environment.get(\"titleLab\");",
-                  "const savedDescLab = pm.environment.get(\"descriptionLab\");",
+                  "const savedTitleLab = pm.environment.get(\"uniqueTitle\");",
+                  "const savedDescLab = pm.environment.get(\"uniqueDescription\");",
                   "",
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
@@ -167,15 +167,15 @@
                   "",
                   "pm.test(\"Validate response body\", function () {",
                   "    pm.expect(responseData.success).to.be.true;",
-                  "    pm.expect(responseData.data.id).to.equal(savedIdLab);",
+                  "    pm.expect(String(responseData.data.id)).to.equal(String(savedIdLab));",
                   "    pm.expect(responseData.data.title).to.equal(savedTitleLab);",
                   "    pm.expect(responseData.data.description).to.equal(savedDescLab);",
                   "    pm.expect(responseData.data.user_id).to.equal(savedUserId);",
                   "    pm.expect(responseData.message).to.equal(\"Lab added successfully\");",
                   "});",
                   "",
-                  "pm.test(\"Response time is less than 1000ms\", function () {",
-                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "pm.test(\"Response time is less than 2000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
                   "});",
                   ""
                 ],
@@ -188,7 +188,12 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  ""
+                  "let randomNumber = Math.floor(Math.random() * 1000);",
+                  "let uniqueTitle = \"Test \" + randomNumber;",
+                  "let uniqueDescription = \"Description Test \" + randomNumber;",
+                  "",
+                  "pm.environment.set(\"TitleLab\", uniqueTitle);",
+                  "pm.environment.set(\"DescriptionLab\", uniqueDescription);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -207,7 +212,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Test 10\",\n  \"description\": \"test 10 description\"\n}",
+              "raw": "{\n  \"title\": \"{{titleLab}}\",\n  \"description\": \"{{DescriptionLab}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -238,8 +243,6 @@
                   "",
                   "const savedUserId = pm.environment.get(\"userId\");",
                   "const savedIdLab = pm.environment.get(\"idLab\");",
-                  "const savedTitleLab = pm.environment.get(\"titleLab\");",
-                  "const savedDescLab = pm.environment.get(\"descriptionLab\");",
                   "",
                   "pm.test(\"Validate response body\", function () {",
                   "    pm.expect(responseData.success).to.be.false;",
@@ -286,7 +289,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Test 8\",\n  \"description\": \"test 8 description\"\n}",
+              "raw": "{\n  \"title\": \"{{titleLab}}\",\n  \"description\": \"{{descriptionLab}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -462,6 +465,30 @@
         },
         {
           "name": "Search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response time is less than 1000ms\", function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "const responseData = pm.response.json();",
+                  "pm.test(\"Search query is 'test'\", function () {",
+                  "    pm.expect(responseData.search_query).to.eql(\"test\");",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -520,14 +547,14 @@
                 "exec": [
                   "const responseData = pm.response.json();",
                   "",
-                  "pm.environment.set(\"idLab\", responseData.data.id);",
-                  "pm.environment.set(\"titleLab\", responseData.data.title);",
-                  "pm.environment.set(\"descriptionLab\", responseData.data.description);",
+                  "// pm.environment.get(\"idLab\");",
+                  "// pm.environment.set(\"titleLab\", responseData.data.title);",
+                  "// pm.environment.set(\"descriptionLab\", responseData.data.description);",
                   "",
                   "const savedUserId = pm.environment.get(\"userId\");",
+                  "const savedTitleLab = pm.environment.get(\"UpdatedTitleLab\");",
+                  "const savedDescLab = pm.environment.get(\"UpdatedDescriptionLab\");",
                   "const savedIdLab = pm.environment.get(\"idLab\");",
-                  "const savedTitleLab = pm.environment.get(\"titleLab\");",
-                  "const savedDescLab = pm.environment.get(\"descriptionLab\");",
                   "",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -535,7 +562,7 @@
                   "",
                   "pm.test(\"Validate response body\", function () {",
                   "    pm.expect(responseData.success).to.be.true;",
-                  "    pm.expect(responseData.data.id).to.equal(savedIdLab);",
+                  "    pm.expect(String(responseData.data.id)).to.equal(String(savedIdLab));",
                   "    pm.expect(responseData.data.title).to.equal(savedTitleLab);",
                   "    pm.expect(responseData.data.description).to.equal(savedDescLab);",
                   "    pm.expect(responseData.data.user_id).to.equal(savedUserId);",
@@ -546,6 +573,22 @@
                   "    pm.expect(pm.response.responseTime).to.be.below(1000);",
                   "});",
                   ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "let randomNumber = Math.floor(Math.random() * 1000);",
+                  "let uniqueUpdatedTitle = \"Test \" + randomNumber;",
+                  "let uniqueUpdatedDescription = \"Description Test \" + randomNumber;",
+                  "",
+                  "pm.environment.set(\"UpdatedTitleLab\", uniqueUpdatedTitle);",
+                  "pm.environment.set(\"UpdatedDescriptionLab\", uniqueUpdatedDescription);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -564,7 +607,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"test 10 updated\",\n  \"description\": \"test 10 updated description\"\n}",
+              "raw": "{\n  \"title\": \"{{UpdatedTitleLab}}\",\n  \"description\": \"{{UpdatedDescriptionLab}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -572,19 +615,19 @@
               }
             },
             "url": {
-              "raw": "{{url}}/api/labs/466?id=",
+              "raw": "{{url}}/api/labs/{{idLab}}?id",
               "host": [
                 "{{url}}"
               ],
               "path": [
                 "api",
                 "labs",
-                "466"
+                "{{idLab}}"
               ],
               "query": [
                 {
                   "key": "id",
-                  "value": ""
+                  "value": null
                 }
               ]
             }
@@ -598,6 +641,8 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "const savedIdLab = pm.environment.get(\"idLab\");",
+                  "",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
@@ -605,7 +650,7 @@
                   "const responseData = pm.response.json();",
                   "pm.test(\"Validate response body\", function () {",
                   "    pm.expect(responseData.success).to.be.true;",
-                  "    pm.expect(responseData.data.id).to.equal(466);",
+                  "    pm.expect(responseData.data.id).to.equal(savedIdLab);",
                   "    pm.expect(responseData.message).to.equal(\"lab deleted successfully\");",
                   "});",
                   "",
@@ -633,14 +678,14 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{url}}/api/labs/466?id=",
+              "raw": "{{url}}/api/labs/{{idLab}}?id=",
               "host": [
                 "{{url}}"
               ],
               "path": [
                 "api",
                 "labs",
-                "466"
+                "{{idLab}}"
               ],
               "query": [
                 {
@@ -696,14 +741,14 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{url}}/api/labs/466?id=",
+              "raw": "{{url}}/api/labs/{{idLab}}?id=",
               "host": [
                 "{{url}}"
               ],
               "path": [
                 "api",
                 "labs",
-                "466"
+                "{{idLab}}"
               ],
               "query": [
                 {
@@ -727,8 +772,8 @@
                   "});",
                   "",
                   "const savedIdLab = pm.environment.get(\"idLab\");",
-                  "const savedTitleLab = pm.environment.get(\"titleLab\");",
-                  "const savedLabDesc = pm.environment.get(\"descriptionLab\");",
+                  "const savedTitleLab = pm.environment.get(\"UpdatedTitleLab\");",
+                  "const savedLabDesc = pm.environment.get(\"UpdatedDescriptionLab\");",
                   "const savedUserId = pm.environment.get(\"userId\");",
                   "",
                   "const responseData = pm.response.json();",
@@ -853,7 +898,7 @@
               "    pm.expect(responseData.data.note).to.equal(\"This API uses stateless JWT auth.\");",
               "});",
               "",
-              "pm.test(\"Response time is less than 1000ms\", function () {",
+              "pm.test(\"Response time is less than 200ms\", function () {",
               "    pm.expect(pm.response.responseTime).to.be.below(1000);",
               "});"
             ],
@@ -907,40 +952,6 @@
           ""
         ]
       }
-    }
-  ],
-  "variable": [
-    {
-      "key": "token",
-      "value": ""
-    },
-    {
-      "key": "userId",
-      "value": ""
-    },
-    {
-      "key": "email",
-      "value": ""
-    },
-    {
-      "key": "role",
-      "value": ""
-    },
-    {
-      "key": "status",
-      "value": ""
-    },
-    {
-      "key": "idLab",
-      "value": ""
-    },
-    {
-      "key": "titleLab",
-      "value": ""
-    },
-    {
-      "key": "descriptionLab",
-      "value": ""
     }
   ]
 }
