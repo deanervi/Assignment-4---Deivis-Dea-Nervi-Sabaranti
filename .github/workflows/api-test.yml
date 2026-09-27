@@ -26,5 +26,6 @@ jobs:
         run: |
           npx --yes newman run project.json \
             --environment env.json \
+            --iteration-data labs-data.csv \
             --env-var "email=$API_EMAIL" \
             --env-var "password=$API_PASSWORD"
