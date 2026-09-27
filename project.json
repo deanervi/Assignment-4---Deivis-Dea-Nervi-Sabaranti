@@ -244,7 +244,12 @@
                   "const csvTitle = pm.iterationData.get(\"title\");",
                   "const uniqueSuffix = Date.now() + \"-\" + pm.info.iteration;",
                   "const testTitle = expectedStatus === \"201\" ? csvTitle + \" \" + uniqueSuffix : csvTitle;",
-                  "pm.variables.set(\"dataDrivenTitle\", testTitle);"
+                  "pm.variables.set(\"dataDrivenTitle\", testTitle);",
+                  "const dataDrivenBody = JSON.stringify({",
+                  "    title: testTitle,",
+                  "    description: pm.iterationData.get(\"description\")",
+                  "});",
+                  "pm.variables.set(\"dataDrivenBody\", dataDrivenBody);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -297,7 +302,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"{{dataDrivenTitle}}\",\n  \"description\": \"{{description}}\"\n}",
+              "raw": "{{dataDrivenBody}}",
               "options": {
                 "raw": {
                   "language": "json"
